@@ -1,4 +1,45 @@
 import tkinter as tk
+import random
+
+# Crear el tablero
+def crear_tablero():
+    return [["🌊"] * 9 for _ in range(9)]
+
+# Mostrar el tablero en Tkinter
+def mostrar_tablero(tablero, botones):
+    for fila in range(9):
+        for columna in range(9):
+            botones[fila][columna].config(text=tablero[fila][columna])
+
+# Colocar el barco en una posición aleatoria
+def colocar_barco():
+    fila = random.randint(0, 8)
+    columna = random.randint(0, 8)
+    return (fila, columna)
+
+# Función para manejar el clic en un botón
+def manejar_click(fila, columna):
+    global intentos, barco, tablero, botones
+
+    if (fila, columna) == barco:
+        tablero[fila][columna] = "💥"
+        mostrar_tablero(tablero, botones)
+        resultado_label.config(text="¡Hundiste el barco! 🚢", fg="green")
+        for f in range(9):
+            for c in range(9):
+                botones[f][c].config(state="disabled")
+    else:
+        if tablero[fila][columna] == "🌊":
+            tablero[fila][columna] = "❌"
+            intentos -= 1
+            mostrar_tablero(tablero, botones)
+            resultado_label.config(text=f"Fallaste. Te quedan {intentos} intentos.", fg="red")
+
+            if intentos == 0:
+                resultado_label.config(text=f"¡Juego terminado! El barco estaba en la posición: {barco}", fg="red")
+                for f in range(9):
+                    for c in range(9):
+                        botones[f][c].config(state="disabled")
 
 # Función para abrir la segunda ventana con selección de nivel de dificultad
 def abrir_ventana():
@@ -13,6 +54,9 @@ def abrir_ventana():
     def seleccionar_dificultad(nivel):
         print(f"Nivel seleccionado: {nivel}")
         ventana1.destroy()  # Cerrar la ventana después de seleccionar
+        
+        if nivel == "Difícil":
+            iniciar_juego_dificil()  # Llama a la función para iniciar el juego en nivel difícil
 
     # Crear botones de selección de nivel de dificultad
     boton_facil = tk.Button(ventana1, text="Fácil", command=lambda: seleccionar_dificultad("Fácil"))
@@ -26,6 +70,35 @@ def abrir_ventana():
 
     # Iniciar el bucle principal de la ventana
     ventana1.mainloop()
+
+# Función para iniciar el juego en nivel difícil
+def iniciar_juego_dificil():
+    global intentos, barco, tablero, botones, resultado_label
+
+    # Configuración inicial del juego
+    ventana_juego = tk.Tk()
+    ventana_juego.title('Batalla Naval - Nivel Difícil 🚢')
+
+    tablero = crear_tablero()
+    barco = colocar_barco()
+    intentos = 6
+
+    # Crear botones para la cuadrícula
+    botones = []
+    for fila in range(9):
+        fila_botones = []
+        for columna in range(9):
+            boton = tk.Button(ventana_juego, text="🌊", width=4, height=2, command=lambda f=fila, c=columna: manejar_click(f, c))
+            boton.grid(row=fila, column=columna)
+            fila_botones.append(boton)
+        botones.append(fila_botones)
+
+    # Etiqueta para mostrar el resultado
+    resultado_label = tk.Label(ventana_juego, text=f"Tienes {intentos} intentos para hundir el barco.")
+    resultado_label.grid(row=9, column=0, columnspan=9)
+
+    # Iniciar el bucle principal de la ventana
+    ventana_juego.mainloop()
 
 # Crear la ventana principal
 ventana2 = tk.Tk()
@@ -59,6 +132,9 @@ boton_abrir.pack(pady=10)
 # Crear un botón que cierra la aplicación
 boton_salir = tk.Button(ventana2, text="Salir Juego", command=ventana2.destroy)
 boton_salir.pack(pady=10)
+
+# Iniciar el bucle principal de la ventana principal
+ventana2.mainloop()
 
 # Iniciar el bucle principal de la ventana principal
 ventana2.mainloop()
