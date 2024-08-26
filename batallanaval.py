@@ -38,14 +38,14 @@ def jugar():
     print("| |  _ \\| |/ _ \\ '_ \\ \\ / / _ \\ '_ \\| |/ _` |/ _ \\   / _` | |  _ \\ / _` | __/ _` | | |/ _` | |  \\| |/ _` \\ \\ / / _` | | |")
     print("| | |_) | |  __/ | | \\ V /  __/ | | | | (_| | (_) | | (_| | | |_) | (_| | || (_| | | | (_| | | |\\  | (_| |\\ V / (_| | |_|")
     print("|_|____/|_|\\___|_| |_|\\_/ \\___|_| |_|_|\\__,_|\\___/   \\__,_| |____/ \\__,_|\\__\\__,_|_|_|\\__,_| |_| \\_|\\__,_| \\_/ \\__,_|_(_)")
-    print("Tienes 6 intentos para hundir el barco.")
+    print("Tienes 6 intentos para hundir el barco 🚢.")
     mostrar_tablero(tablero)
 
     while intentos > 0:
         fila, columna = pedir_posicion()
 
         if (fila, columna) == barco:
-            print("¡Felicidades! ¡Hundiste el barco!")
+            print("¡Felicidades! ¡Hundiste el barco!🚢")
             tablero[fila][columna] = "💥"
             mostrar_tablero(tablero)
             break
@@ -63,7 +63,7 @@ def jugar():
 
         if intentos == 0:
             print("¡Juego terminado! Se te acabaron los intentos.")
-            print(f"El barco estaba en la posición: {barco}")
+            print(f"El barco estaba en la posición: {barco} 🚢")
 
 # Iniciar el juego
 if __name__ == "__main__":
