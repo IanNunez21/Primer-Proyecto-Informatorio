@@ -1,28 +1,31 @@
 import tkinter as tk
 
-# Función para abrir la segunda ventana
+# Función para abrir la segunda ventana con selección de nivel de dificultad
 def abrir_ventana():
     ventana2.destroy()  # Cierra la ventana principal
     
+    # Crear la nueva ventana para la selección de dificultad
     ventana1 = tk.Tk()
-    ventana1.title('Barra de desplazamiento')
+    ventana1.title('Selecciona Nivel de Dificultad')
     ventana1.geometry('400x200')
 
-    marco = tk.Frame(ventana1)  # frame es un contenedor
-    marco.pack(padx=10, pady=10)  # posiciona el frame en la ventana con un padding de 10 en x y en y
+    # Función para manejar la selección de nivel de dificultad
+    def seleccionar_dificultad(nivel):
+        print(f"Nivel seleccionado: {nivel}")
+        ventana1.destroy()  # Cerrar la ventana después de seleccionar
 
-    scrollbar = tk.Scrollbar(marco)  # crea un scrollbar en el frame
-    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)  # posiciona el scrollbar en el frame a la derecha y que se expanda en y
+    # Crear botones de selección de nivel de dificultad
+    boton_facil = tk.Button(ventana1, text="Fácil", command=lambda: seleccionar_dificultad("Fácil"))
+    boton_facil.pack(pady=10)
 
-    lista = tk.Listbox(marco, yscrollcommand=scrollbar.set)  # crea una lista en el frame
-    for i in range(100):  # agrega 100 elementos a la lista
-        lista.insert(tk.END, f'Elemento {i+1}')  # inserta un elemento al final de la lista
+    boton_medio = tk.Button(ventana1, text="Medio", command=lambda: seleccionar_dificultad("Medio"))
+    boton_medio.pack(pady=10)
 
-    lista.pack(side=tk.LEFT, fill=tk.BOTH)  # posiciona la lista a la izquierda y que se expanda en x y en y
+    boton_dificil = tk.Button(ventana1, text="Difícil", command=lambda: seleccionar_dificultad("Difícil"))
+    boton_dificil.pack(pady=10)
 
-    scrollbar.config(command=lista.yview)  # configura el scrollbar para que controle la vista en y de la lista
-
-    ventana1.mainloop()  # inicia el bucle principal de la ventana
+    # Iniciar el bucle principal de la ventana
+    ventana1.mainloop()
 
 # Crear la ventana principal
 ventana2 = tk.Tk()
@@ -57,5 +60,5 @@ boton_abrir.pack(pady=10)
 boton_salir = tk.Button(ventana2, text="Salir Juego", command=ventana2.destroy)
 boton_salir.pack(pady=10)
 
-# Iniciar el bucle principal de la ventana
+# Iniciar el bucle principal de la ventana principal
 ventana2.mainloop()
