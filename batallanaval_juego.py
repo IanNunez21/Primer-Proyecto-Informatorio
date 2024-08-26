@@ -22,14 +22,14 @@ def colocar_barco():
 def pedir_posicion():
     while True:
         try:
-            fila = int(input("Ingresa el número de fila (0-8): "))
-            columna = int(input("Ingresa el número de columna (0-8): "))
+            fila = int(input(Fore.CYAN+"Ingresa el número de fila (0-8): "))
+            columna = int(input(Fore.CYAN+"Ingresa el número de columna (0-8): "))
             if 0 <= fila <= 8 and 0 <= columna <= 8:
                 return (fila, columna)
             else:
-                print("Por favor, ingresa números dentro del rango (0-8).")
+                print(Fore.RED+"Por favor, ingresa números dentro del rango (0-8).")
         except ValueError:
-            print("Entrada inválida. Por favor, ingresa un número.")
+            print(Fore.RED+"Entrada inválida. Por favor, ingresa un número.")
 
 # Juego principal
 def jugar():
