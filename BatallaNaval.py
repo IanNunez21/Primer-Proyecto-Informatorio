@@ -3,175 +3,155 @@ from PIL import Image, ImageTk
 import pygame
 import random
 
-pygame.mixer.init()
+class BatallaNaval:
+    def __init__(self):
+        pygame.mixer.init()
+        self.ventana_principal = tk.Tk()
+        self.ventana_principal.title('Batalla Naval 🚢')
+        self.ventana_principal.geometry('400x200')
 
-#Cargo y reproduzco la musica de fondo
-def reproducir_musica():
-    pygame.mixer.music.load("Musica_Fondo.mp3")
-    pygame.mixer.music.play(-1)
+        self.imagen_original = Image.open("Fondo.png")
 
-# Crear el tablero
-def crear_tablero():
-    return [["🌊"] * 9 for _ in range(9)]
+        # Crear un label con la imagen de fondo
+        self.label_fondo = tk.Label(self.ventana_principal)
+        self.label_fondo.place(x=0, y=0, relwidth=1, relheight=1)
+        self.ventana_principal.bind("<Configure>", self.actualizar_fondo)
 
-# Mostrar el tablero en Tkinter
-def mostrar_tablero(tablero, botones):
-    for fila in range(9):
-        for columna in range(9):
-            botones[fila][columna].config(text=tablero[fila][columna])
+        self.boton_abrir = tk.Button(self.ventana_principal, text="Comenzar Juego", command=self.abrir_ventana)
+        self.boton_abrir.pack(pady=10)
 
-# Colocar el barco en una posición aleatoria
-def colocar_barco():
-    fila = random.randint(0, 8)
-    columna = random.randint(0, 8)
-    return (fila, columna)
+        self.boton_salir = tk.Button(self.ventana_principal, text="Salir Juego", command=self.ventana_principal.destroy)
+        self.boton_salir.pack(pady=10)
 
-# Función para manejar el clic en un botón
-def manejar_click(fila, columna):
-    global intentos, barco, tablero, botones
+        # Crear la barra de menú
+        self.barra_menu = tk.Menu(self.ventana_principal)
+        self.ventana_principal.config(menu=self.barra_menu)
 
-    if (fila, columna) == barco:
-        tablero[fila][columna] = "💥"
-        mostrar_tablero(tablero, botones)
-        resultado_label.config(text="¡Hundiste el barco! 🚢", fg="green")
-        for f in range(9):
-            for c in range(9):
-                botones[f][c].config(state="disabled")
-    else:
-        if tablero[fila][columna] == "🌊":
-            tablero[fila][columna] = "❌"
-            intentos -= 1
-            mostrar_tablero(tablero, botones)
-            resultado_label.config(text=f"Fallaste. Te quedan {intentos} intentos.", fg="red")
+        self.menu_principal = tk.Menu(self.barra_menu, tearoff=0)
+        self.barra_menu.add_cascade(label='Principal', menu=self.menu_principal)
 
-            if intentos == 0:
-                resultado_label.config(text=f"¡Juego terminado! El barco estaba en la posición: {barco}", fg="red")
-                for f in range(9):
-                    for c in range(9):
-                        botones[f][c].config(state="disabled")
+        self.submenu = tk.Menu(self.menu_principal, tearoff=0)
+        self.menu_principal.add_cascade(label='Opciones', menu=self.submenu)
+
+        self.submenu.add_command(label='Opción 1', command=self.ventana_principal.destroy)
+        self.submenu.add_command(label='Opción 2', command=self.mostrar_mensaje)
+
+        # Reproducir la música de fondo
+        self.reproducir_musica()
+
+        # Levantar los botones para que estén sobre la imagen de fondo
+        self.boton_abrir.lift()
+        self.boton_salir.lift()
+
+        # Iniciar el bucle principal de la ventana
+        self.ventana_principal.mainloop()
+
+    def reproducir_musica(self):
+        pygame.mixer.music.load("Musica_Fondo.mp3")
+        pygame.mixer.music.set_volume(0.4)
+        pygame.mixer.music.play(-1)
+
+    def actualizar_fondo(self, event):
+        ancho = self.ventana_principal.winfo_width()
+        alto = self.ventana_principal.winfo_height()
+
+        imagen_redimensionada = self.imagen_original.resize((ancho, alto), Image.Resampling.LANCZOS)
+        imagen_fondo = ImageTk.PhotoImage(imagen_redimensionada)
+
+        self.label_fondo.config(image=imagen_fondo)
+        self.label_fondo.image = imagen_fondo
+
+    def abrir_ventana(self):
+        self.ventana_principal.destroy()
+
+        ventana_dificultad = VentanaDificultad()
+        ventana_dificultad.ventana.mainloop()
+
+    def mostrar_mensaje(self):
+        print('Mensaje')
 
 
-# Función para abrir la segunda ventana con selección de nivel de dificultad
-def abrir_ventana():
-    ventana2.destroy()  # Cierra la ventana principal
-    
-    # Crear la nueva ventana para la selección de dificultad
-    ventana1 = tk.Tk()
-    ventana1.title('Selecciona Nivel de Dificultad')
-    ventana1.geometry('400x200')
+class VentanaDificultad:
+    def __init__(self):
+        self.ventana = tk.Tk()
+        self.ventana.title('Selecciona Nivel de Dificultad')
+        self.ventana.geometry('400x200')
 
-    # Función para manejar la selección de nivel de dificultad
-    def seleccionar_dificultad(nivel):
+        self.boton_facil = tk.Button(self.ventana, text="Fácil", command=lambda: self.seleccionar_dificultad("Fácil"))
+        self.boton_facil.pack(pady=10)
+
+        self.boton_medio = tk.Button(self.ventana, text="Medio", command=lambda: self.seleccionar_dificultad("Medio"))
+        self.boton_medio.pack(pady=10)
+
+        self.boton_dificil = tk.Button(self.ventana, text="Difícil", command=lambda: self.seleccionar_dificultad("Difícil"))
+        self.boton_dificil.pack(pady=10)
+
+    def seleccionar_dificultad(self, nivel):
         print(f"Nivel seleccionado: {nivel}")
-        ventana1.destroy()  # Cerrar la ventana después de seleccionar
-        
+        self.ventana.destroy()
+
         if nivel == "Difícil":
-            iniciar_juego_dificil()  # Llama a la función para iniciar el juego en nivel difícil
-
-    # Crear botones de selección de nivel de dificultad
-    boton_facil = tk.Button(ventana1, text="Fácil", command=lambda: seleccionar_dificultad("Fácil"))
-    boton_facil.pack(pady=10)
-
-    boton_medio = tk.Button(ventana1, text="Medio", command=lambda: seleccionar_dificultad("Medio"))
-    boton_medio.pack(pady=10)
-
-    boton_dificil = tk.Button(ventana1, text="Difícil", command=lambda: seleccionar_dificultad("Difícil"))
-    boton_dificil.pack(pady=10)
-
-    # Iniciar el bucle principal de la ventana
-    ventana1.mainloop()
-
-# Función para iniciar el juego en nivel difícil
-def iniciar_juego_dificil():
-    global intentos, barco, tablero, botones, resultado_label
-
-    # Configuración inicial del juego
-    ventana_juego = tk.Tk()
-    ventana_juego.title('Batalla Naval - Nivel Difícil 🚢')
-
-    tablero = crear_tablero()
-    barco = colocar_barco()
-    intentos = 6
-
-    # Crear botones para la cuadrícula
-    botones = []
-    for fila in range(9):
-        fila_botones = []
-        for columna in range(9):
-            boton = tk.Button(ventana_juego, text="🌊", width=4, height=2, command=lambda f=fila, c=columna: manejar_click(f, c))
-            boton.grid(row=fila, column=columna)
-            fila_botones.append(boton)
-        botones.append(fila_botones)
-
-    # Etiqueta para mostrar el resultado
-    resultado_label = tk.Label(ventana_juego, text=f"Tienes {intentos} intentos para hundir el barco.")
-    resultado_label.grid(row=9, column=0, columnspan=9)
-
-    # Iniciar el bucle principal de la ventana
-    ventana_juego.mainloop()
-
-# Crear la ventana principal
-ventana2 = tk.Tk()
-ventana2.title('Batalla Naval🚢')
-ventana2.geometry('400x200')
-
-#Cargo la imagen de fondo original
-imagen_original = Image.open("Fondo.png")
+            juego_dificil = JuegoDificil()
+            juego_dificil.ventana.mainloop()
 
 
-#Creo un label con la imagen de fondo
-label_fondo = tk.Label(ventana2)
-label_fondo.place(x=0, y=0, relwidth=1, relheight=1)
+class JuegoDificil:
+    def __init__(self):
+        self.ventana = tk.Tk()
+        self.ventana.title('Batalla Naval - Nivel Difícil 🚢')
 
-def actualizar_fondo(event):
-    #Obtengo el tamaño actual de la ventana
-    ancho = ventana2.winfo_width()
-    alto = ventana2.winfo_height()
+        self.tablero = self.crear_tablero()
+        self.barco = self.colocar_barco()
+        self.intentos = 6
 
-    #Redimensiono la imagen al tamaño actual de la ventana
-    imagen_redimensionada = imagen_original.resize((ancho, alto), Image.Resampling.LANCZOS)
-    imagen_fondo = ImageTk.PhotoImage(imagen_redimensionada)
+        self.botones = []
+        for fila in range(9):
+            fila_botones = []
+            for columna in range(9):
+                boton = tk.Button(self.ventana, text="🌊", width=4, height=2,
+                                  command=lambda f=fila, c=columna: self.manejar_click(f, c))
+                boton.grid(row=fila, column=columna)
+                fila_botones.append(boton)
+            self.botones.append(fila_botones)
 
-    #Actualizo la imagen en el label
-    label_fondo.config(image=imagen_fondo)
-    label_fondo.image = imagen_fondo
+        self.resultado_label = tk.Label(self.ventana, text=f"Tienes {self.intentos} intentos para hundir el barco.")
+        self.resultado_label.grid(row=9, column=0, columnspan=9)
 
-#Vinculo el evento de redimensionamiento de la ventana a la funcion de actualizacion
-ventana2.bind("<Configure>", actualizar_fondo)
+    def crear_tablero(self):
+        return [["🌊"] * 9 for _ in range(9)]
 
-#Reproduzco la musica
-reproducir_musica()
+    def colocar_barco(self):
+        fila = random.randint(0, 8)
+        columna = random.randint(0, 8)
+        return fila, columna
 
-# Crear la barra de menú y configurarla en la ventana
-barra_menu = tk.Menu(ventana2)
-ventana2.config(menu=barra_menu)
+    def mostrar_tablero(self):
+        for fila in range(9):
+            for columna in range(9):
+                self.botones[fila][columna].config(text=self.tablero[fila][columna])
 
-# Crear el menú principal y agregarlo a la barra de menú
-menu_principal = tk.Menu(barra_menu, tearoff=0)
-barra_menu.add_cascade(label='Principal', menu=menu_principal)
+    def manejar_click(self, fila, columna):
+        if (fila, columna) == self.barco:
+            self.tablero[fila][columna] = "💥"
+            self.mostrar_tablero()
+            self.resultado_label.config(text="¡Hundiste el barco! 🚢", fg="green")
+            self.deshabilitar_botones()
+        else:
+            if self.tablero[fila][columna] == "🌊":
+                self.tablero[fila][columna] = "❌"
+                self.intentos -= 1
+                self.mostrar_tablero()
+                self.resultado_label.config(text=f"Fallaste. Te quedan {self.intentos} intentos.", fg="red")
 
-# Crear un submenú y agregarlo al menú principal
-submenu = tk.Menu(menu_principal, tearoff=0)
-menu_principal.add_cascade(label='Opciones', menu=submenu)
+                if self.intentos == 0:
+                    self.resultado_label.config(text=f"¡Juego terminado! El barco estaba en la posición: {self.barco}", fg="red")
+                    self.deshabilitar_botones()
 
-# Definir una función para mostrar un mensaje
-def mostrar_mensaje():
-    print('Mensaje')
+    def deshabilitar_botones(self):
+        for fila in range(9):
+            for columna in range(9):
+                self.botones[fila][columna].config(state="disabled")
 
-# Agregar opciones al submenú
-submenu.add_command(label='Opción 1', command=ventana2.destroy)
-submenu.add_command(label='Opción 2', command=mostrar_mensaje)
 
-# Crear un botón en la ventana principal que abre la segunda ventana
-boton_abrir = tk.Button(ventana2, text="Comenzar Juego", command=abrir_ventana)
-boton_abrir.pack(pady=10)
-
-# Crear un botón que cierra la aplicación
-boton_salir = tk.Button(ventana2, text="Salir Juego", command=ventana2.destroy)
-boton_salir.pack(pady=10)
-
-boton_abrir.lift()
-boton_salir.lift()
-
-# Iniciar el bucle principal de la ventana
-ventana2.mainloop()
+if __name__ == "__main__":
+    juego = BatallaNaval()
